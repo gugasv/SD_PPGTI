@@ -10,7 +10,8 @@ import (
 	"strings"
 )
 
-func readOption() int {
+func readOption(msg string) int {
+	fmt.Print(msg)
 	var reader = bufio.NewReader(os.Stdin)
 	input, _ := reader.ReadString('\n')
 	op, err := strconv.Atoi(strings.TrimSpace(input))
@@ -25,7 +26,7 @@ func readOption() int {
 }
 
 func menuLoop(client *rpc.Client) {
-	var op int = readOption()
+	var op int = readOption("Escolha a opção: (1-append; 2-remove; 3-size; 4-get)")
 
 	for op != 0 {
 		switch op {
@@ -40,7 +41,7 @@ func menuLoop(client *rpc.Client) {
 		default:
 			fmt.Print("Digite uma opção válida! ")
 		}
-		op = readOption()
+		op = readOption("Escolha a opção: (1-append; 2-remove; 3-size; 4-get)")
 	}
 	client.Close()
 }
@@ -49,11 +50,11 @@ func callAppend(client *rpc.Client) {
 	// Append
 	var reply bool
 	param := new(remotelist.RemoteRequest)
-	param.Id = 0
-	param.Value = 10
+	param.Id = readOption("Identificador da lista: ")
+	param.Value = readOption("Valor: ")
 	err := client.Call("RemoteList.Append", param, &reply)
 	if err != nil {
-		fmt.Print("Error:", err)
+		fmt.Println("Error:", err)
 	} else {
 		fmt.Println("Elemento adicionado:", reply)
 	}
@@ -62,9 +63,10 @@ func callAppend(client *rpc.Client) {
 func callRemove(client *rpc.Client) {
 	// Remove
 	var reply bool
-	err := client.Call("RemoteList.Remove", 0, &reply)
+	id := readOption("Identificador da lista: ")
+	err := client.Call("RemoteList.Remove", id, &reply)
 	if err != nil {
-		fmt.Print("Error:", err)
+		fmt.Println("Error:", err)
 	} else {
 		fmt.Println("Elemento removido:", reply)
 	}
@@ -73,12 +75,12 @@ func callRemove(client *rpc.Client) {
 func callGet(client *rpc.Client) {
 	// Get
 	param := new(remotelist.RemoteRequest)
-	param.Id = 0
-	param.Value = 0
+	param.Id = readOption("Identificador da lista: ")
+	param.Value = readOption("Posição: ")
 	var reply int
 	err := client.Call("RemoteList.Get", param, &reply)
 	if err != nil {
-		fmt.Print("Error:", err)
+		fmt.Println("Error:", err)
 	} else {
 		fmt.Println("Elemento: ", reply)
 	}
@@ -87,9 +89,10 @@ func callGet(client *rpc.Client) {
 func callSize(client *rpc.Client) {
 	// Size
 	var reply int
-	err := client.Call("RemoteList.Size", 0, &reply)
+	id := readOption("Identificador da lista: ")
+	err := client.Call("RemoteList.Size", id, &reply)
 	if err != nil {
-		fmt.Print("Error:", err)
+		fmt.Println("Error:", err)
 	} else {
 		fmt.Println("Tamanho:", reply)
 	}

@@ -10,7 +10,7 @@ import (
 )
 
 func loadData() *remotelist.RemoteList {
-	content, err := ioutil.ReadFile("userfile.json")
+	content, err := ioutil.ReadFile(remotelist.Filename)
 	if err != nil {
 		return remotelist.NewRemoteList()
 	}

@@ -8,6 +8,8 @@ import (
 	"sync"
 )
 
+var Filename string = "listfile.json"
+
 type RemoteRequest struct {
 	Id    int
 	Value int
@@ -37,8 +39,8 @@ func (l *RemList) Remove() error {
 		l.Items = l.Items[:len(l.Items)-1]
 		fmt.Println(l.Items)
 	} else {
-		fmt.Println("Empty list")
-		return errors.New("empty list")
+		fmt.Println("Lista vazia")
+		return errors.New("Lista vazia")
 	}
 	return nil
 }
@@ -59,7 +61,7 @@ func (l *RemoteList) Remove(id int, reply *bool) error {
 		go l.Lists[id].Remove()
 		go l.Save()
 	} else {
-		return errors.New("list not found")
+		return errors.New("Lista não encontrada")
 	}
 	*reply = true
 	return nil
@@ -67,13 +69,13 @@ func (l *RemoteList) Remove(id int, reply *bool) error {
 
 func (l *RemoteList) Get(req *RemoteRequest, reply *int) error {
 	if ll, contains := l.Lists[req.Id]; contains {
-		if len(ll.Items) > 0 {
+		if req.Value < len(ll.Items) {
 			*reply = ll.Items[req.Value]
 		} else {
 			*reply = -1
 		}
 	} else {
-		return errors.New("list not found")
+		return errors.New("Lista não encontrada")
 	}
 	return nil
 }
@@ -82,14 +84,14 @@ func (l *RemoteList) Size(id int, reply *int) error {
 	if ll, contains := l.Lists[id]; contains {
 		*reply = len(ll.Items)
 	} else {
-		return errors.New("list not found")
+		return errors.New("Lista não encontrada")
 	}
 	return nil
 }
 
 func (l *RemoteList) Save() error {
 	jsonByte, _ := json.Marshal(l)
-	err := ioutil.WriteFile("listfile.json", jsonByte, 0644)
+	err := ioutil.WriteFile(Filename, jsonByte, 0644)
 	if err != nil {
 		return err
 	}
